@@ -1,0 +1,660 @@
+AWSTemplateFormatVersion: 2010-09-09
+Metadata:
+  'AWS::CloudFormation::Designer':
+    281c4fdf-1e76-432b-925f-41bc9b79ce96:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 630
+        'y': 150
+      z: 1
+      embeds: []
+      dependson:
+        - 78cf22bf-ea32-4133-a1f1-0dd071d22ec6
+        - df076b9f-8041-48e9-b330-56da88cfff97
+        - 7e7315b0-f24e-49dc-b1d6-11605e3e50b7
+    deffc1ae-bff8-4b6a-b14e-3564493f7a72:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 120
+        'y': 90
+      z: 1
+      embeds: []
+      dependson:
+        - 281c4fdf-1e76-432b-925f-41bc9b79ce96
+        - df076b9f-8041-48e9-b330-56da88cfff97
+    e447b3d5-1aba-4eac-aecc-e683d8b0c013:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 270
+        'y': 90
+      z: 1
+      embeds: []
+      dependson:
+        - 7f8ae482-e2d8-46bb-9c2c-9c57592d95e5
+    47a8350a-364d-46c4-b976-6757d6a77077:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 720
+        'y': 90
+      z: 1
+      embeds: []
+      dependson:
+        - e447b3d5-1aba-4eac-aecc-e683d8b0c013
+    17e05aca-13f8-4fe6-9aa0-a09be3c43af3:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 840
+        'y': 90
+      z: 1
+      embeds: []
+      dependson:
+        - e447b3d5-1aba-4eac-aecc-e683d8b0c013
+    df076b9f-8041-48e9-b330-56da88cfff97:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 480
+        'y': 150
+      z: 1
+      embeds: []
+      dependson:
+        - 4ba38984-499b-4314-abbe-c134da4c0c39
+    037124e6-9108-4fe7-bb34-0d6df851da35:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 390
+        'y': 300
+      z: 1
+      embeds: []
+    8baf6c02-7ae5-4d81-a793-7ac9852cab7f:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 570
+        'y': 300
+      z: 1
+      embeds: []
+      isassociatedwith:
+        - 037124e6-9108-4fe7-bb34-0d6df851da35
+    7e7315b0-f24e-49dc-b1d6-11605e3e50b7:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 120
+        'y': 300
+      z: 1
+      embeds: []
+      dependson:
+        - dcee8006-68c6-4d6a-8850-167794a1663b
+        - 72e442b5-91e9-4a62-b69a-e76efb868f87
+        - 281c4fdf-1e76-432b-925f-41bc9b79ce96
+    35933ede-3465-4157-893d-ad66423a2c60:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 360
+        'y': 90
+      z: 1
+      embeds: []
+      isassociatedwith:
+        - deffc1ae-bff8-4b6a-b14e-3564493f7a72
+    32d617f6-afb9-40c9-bd6b-10c3dc8a8f72:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 120
+        'y': 180
+      z: 1
+      embeds: []
+      dependson:
+        - 7e7315b0-f24e-49dc-b1d6-11605e3e50b7
+        - 281c4fdf-1e76-432b-925f-41bc9b79ce96
+    b067692c-db9b-45ad-9226-f5adcf8a9c8c:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 930
+        'y': 90
+      z: 1
+      embeds: []
+    4ba38984-499b-4314-abbe-c134da4c0c39:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 1050
+        'y': 90
+      z: 1
+      embeds: []
+Resources:
+  EC2SG3D3DC1:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupName: DC-SG
+      GroupDescription: DC security group
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3389
+          ToPort: 3389
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: -1
+          SourceSecurityGroupId: !GetAtt 
+            - EC2SG3ADFS1
+            - GroupId
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: DC-SG
+      VpcId: !Ref VPCid
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 4ba38984-499b-4314-abbe-c134da4c0c39
+  EC2SG3ADFS1:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupName: ADFS-SG
+      GroupDescription: ADFS security group
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3389
+          ToPort: 3389
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: ADFS-SG
+      VpcId: !Ref VPCid
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: b067692c-db9b-45ad-9226-f5adcf8a9c8c
+  EC2I1MDC1:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: ami-063e6917fb03cd4dd
+      InstanceType: m4.large
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      KeyName: !Ref KeypairName
+      SecurityGroups:
+        - DC-SG
+      Tags:
+        - Key: Name
+          Value: DC-Server
+      UserData: !Base64 
+        'Fn::Sub': >
+          <powershell>
+
+          $varIP = Invoke-RestMethod
+          http://169.254.169.254/latest/meta-data/local-ipv4
+
+          $dn = "${DomainName}"
+          
+          $sd = $dn.split(".")
+          
+          $subdomain = $sd[0]
+          
+          $netbios = $subdomain.ToUpper()
+
+          $userpasswd=ConvertTo-SecureString "${UserPass}" -asplaintext -Force
+
+          $passwd=ConvertTo-SecureString "${DSRMpass}" -asplaintext -Force
+
+          $usernm="${UserName}"
+
+          $urnm = $usernm
+
+          $svcacc = "adfssvc"
+
+          $atrate = '@'
+
+          $atrate+=$dn
+
+          $groupnm="${GroupName}"
+
+          $urnm+=$atrate
+
+          $svcacc+=$atrate
+
+          services.msc
+
+          if(-NOT(Get-Module -Name ActiveDirectory))
+
+          {
+              install-windowsfeature AD-Domain-Services -IncludeManagementTools
+          }
+
+          $osInfo = Get-CimInstance -ClassName Win32_OperatingSystem
+
+          if($osInfo.ProductType -ne 2)
+
+          { 
+            Import-Module ADDSDeployment
+            Install-ADDSForest -CreateDnsDelegation:$false -DatabasePath "C:\Windows\NTDS" -DomainMode "Win2012R2" -DomainName "${DomainName}" -DomainNetbiosName $netbios -ForestMode "Win2012R2" -InstallDns:$true -LogPath "C:\Windows\NTDS" -NoRebootOnCompletion:$false -SysvolPath "C:\Windows\SYSVOL" -Force:$true -SafeModeAdministratorPassword $passwd
+          }
+
+          Start-Sleep -s 10
+
+          if(-NOT(Get-ADUser -Filter {Name -eq $usernm}))
+          {
+              Import-Module ActiveDirectory
+              New-ADUser -Name $usernm -GivenName $usernm -SamAccountName $usernm -UserPrincipalName "$urnm" -AccountPassword $userpasswd -Enabled $true -EmailAddress "$urnm" -ChangePasswordAtLogon $False -PasswordNeverExpires $True              
+              New-ADUser -Name "adfssvc" -GivenName "adfssvc" -SamAccountName "adfssvc" -UserPrincipalName "$svcacc" -AccountPassword $userpasswd -Enabled $true -EmailAddress "$svcacc" -ChangePasswordAtLogon $False -PasswordNeverExpires $True
+          }
+          if(-NOT(Get-ADGroup -Filter {Identity -eq $groupnm}))
+          {
+              New-ADGroup -Name $groupnm -GroupScope Global
+              Add-ADGroupMember -Identity $groupnm -Member $usernm
+          }
+          
+          $user = [ADSI]"WinNT://./Administrator";
+          $user.SetPassword("elGOaat12x!");
+
+          </powershell>
+          <persist>true</persist>
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: df076b9f-8041-48e9-b330-56da88cfff97
+    DependsOn: EC2SG3D3DC1
+  MyBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Ref S3BucketName
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 7e7315b0-f24e-49dc-b1d6-11605e3e50b7
+  EC2I1ADFS1:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: ami-063e6917fb03cd4dd
+      InstanceType: m4.large
+      KeyName: !Ref KeypairName
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      SecurityGroups:
+        - ADFS-SG
+      Tags:
+        - Key: Name
+          Value: ADFS-Server
+      UserData: !Base64 
+        'Fn::Sub': |
+          <powershell>
+          $varIP1 = "${EC2I1MDC1.PrivateIp}"
+          $var1 = "${DomainName}"
+          $sd = $var1.split(".")
+          $subdomain = $sd[0]
+          $var4 = $subdomain
+          $data2 = $subdomain.ToUpper()
+          $var2 = "CN=$env:COMPUTERNAME."
+          $var5 = "$env:COMPUTERNAME."
+          $var2 += $var1
+          $var5 += $var1
+          $var3 = '\adfssvc'
+          $var4 += $var3
+          $data1 = 'C:\Users\Administrator.'
+          $data1 += $data2
+          $admin = '\Administrator'
+          $bname = "${S3BucketName}"
+
+          if((Get-WmiObject -Class Win32_ComputerSystem).PartOfDomain)
+          {  
+              $Filename = 'C:\Users\Administrator\Documents\log.ps1'
+
+                  $username=$data2+$admin
+                  $password="elGOaat12x!"
+                  $securePassword = ConvertTo-SecureString $password -AsPlainText -Force
+                  $credential = New-Object System.Management.Automation.PSCredential $username, $securePassword
+              
+              if(-Not(Test-Path $Filename))
+              {    
+                  New-Item -Path 'C:\Users\Administrator\Documents\log.ps1' -ItemType File
+                  Copy-Item "C:\Program Files\Amazon\Ec2ConfigService\Scripts\UserScript.ps1" -Destination "C:\Users\Administrator\Documents\script.ps1"
+                  Start-Process powershell.exe -Credential $credential -NoNewWindow -ArgumentList "-noexit -command C:\Users\Administrator\Documents\script.ps1"
+              }
+              #install IIS
+              Install-WindowsFeature -Name Web-Server -IncludeAllSubFeature -IncludeManagementTools -Credential $credential
+
+              #install ADFS
+              Add-WindowsFeature ADFS-Federation -includeAllSubFeature -IncludeManagementTools -restart  -Credential $credential
+
+              #get a self-signed certificate
+              $source =  'C:\Users\Administrator\Documents\cert1.zip'
+              $dest = 'C:\Users\Administrator\Documents\cert1.ps1'
+              powershell -command "& { iwr https://gallery.technet.microsoft.com/scriptcenter/Self-signed-certificate-5920a7c6/file/101251/2/New-SelfSignedCertificate.zip -OutFile $source }"
+              [System.Reflection.Assembly]::LoadWithPartialName('System.IO.Compression.FileSystem')
+              [System.IO.Compression.ZipFile]::ExtractToDirectory($source, $dest)
+              
+              Import-Module  'C:\Users\Administrator\Documents\cert1.ps1\New-SelfSignedCertificateEx.ps1'
+              $selfSignedCert = New-SelfSignedCertificateEx -Subject $var2 -EKU "Server Authentication" -KeyUsage 0xa0 -StoreLocation "LocalMachine" -ProviderName "Microsoft Strong Cryptographic Provider" -Exportable
+              $certThumbprint = $selfSignedCert.Thumbprint
+             
+              #configuring ADFS
+              $svcpassword = ConvertTo-SecureString "${UserPass}" -AsPlainText -Force
+              $svcuser = $var4
+              $svccredential = New-Object System.Management.Automation.PSCredential($svcuser,$svcpassword)
+              Import-Module ADFS
+              Install-AdfsFarm -CertificateThumbprint:$certThumbprint -FederationServiceDisplayName:"QLADFS" -FederationServiceName:$var5 -Credential $credential -ServiceAccountCredential:$svccredential 
+              #setspn -a host/localhost adfssvc
+              [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true} ;
+              (new-object System.Net.WebClient).DownloadFile("https://localhost/FederationMetadata/2007-06/FederationMetadata.xml", 'C:\Users\Administrator\Desktop\FederationMetadata.xml')  
+              
+              Add-Content $Filename "Write-S3Object -BucketName $bname -File C:\Users\Administrator\Desktop\FederationMetadata.xml"
+              Start-Process powershell.exe -NoNewWindow -ArgumentList "-noexit -command C:\Users\Administrator\Documents\log.ps1"
+              Start-Sleep -s 60
+              #adding claim rules
+
+              $ProviderName = "${SamlProviderName}"
+              
+              $claimrules1 = '@RuleTemplate = "Transform an Incoming Claim" @RuleName = "NameId" c:[Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsaccountname"]=> issue(Type = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", Issuer = c.Issuer, OriginalIssuer = c.OriginalIssuer, Value = c.Value, ValueType = c.ValueType, Properties["http://schemas.xmlsoap.org/ws/2005/05/identity/claimproperties/format"] = "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent");'
+
+              $claimrules2='@RuleTemplate = "Send LDAP Attributes as Claims" @RuleName = "RoleSessionName" c:[Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsaccountname", Issuer == "AD AUTHORITY"]=> issue(store = "Active Directory", types = ("https://aws.amazon.com/SAML/Attributes/RoleSessionName"), query = ";mail;{0}", param = c.Value);'
+
+              $claimrules3='@RuleName = "GetADGroups" c:[Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsaccountname", Issuer == "AD AUTHORITY"]=> add(store = "Active Directory", types = ("http://temp/variable"), query = ";tokenGroups;{0}", param = c.Value);'                                                                                        
+              
+              Add-Content C:\Users\Administrator\Documents\accnumber.ps1 '$Global:AccId = (Get-STSCallerIdentity).Account'
+              cd C:\Users\Administrator\Documents
+              .\accnumber.ps1
+              $cr1 = '@RuleName = "Roles" c:[Type == "http://temp/variable", Value =~ "(?i)^AWS-"]
+              => issue(Type = "https://aws.amazon.com/SAML/Attributes/Role", Value = RegExReplace(c.Value, "AWS-", "arn:aws:iam::'
+              $cr2 = ':saml-provider/'
+              $cr3 = ',arn:aws:iam::'
+              $cr4 = ':role/AWS-"));'
+              $claimrules4 = $cr1+$AccId+$cr2+$ProviderName+$cr3+$AccId+$cr4
+              
+              $claimrules5='@RuleName = "SessionDuration" => issue(Type = "https://aws.amazon.com/SAML/Attributes/SessionDuration", Value = "28800");'
+              
+              $claimrules=$claimrules1+$claimrules2+$claimrules3+$claimrules4+$claimrules5
+
+              $issuerule='=> issue(Type = "http://schemas.microsoft.com/authorization/claims/permit", Value = "true");'
+              
+              Add-Content 'C:\Users\Administrator\Documents\rules.txt' $claimrules   
+
+              Add-ADFSRelyingPartyTrust -Name "Amazon Web Services" -MetadataURL "https://signin.aws.amazon.com/static/saml-metadata.xml" -IssuanceAuthorizationRules $issuerule 
+              $RuleSet = New-AdfsClaimRuleSet -ClaimRuleFile 'C:\Users\Administrator\Documents\rules.txt' 
+              Set-AdfsRelyingPartyTrust -TargetName "Amazon Web Services" -IssuanceTransformRules $RuleSet.ClaimRulesString 
+              Set-ADFSRelyingPartyTrust -TargetName "Amazon Web Services" -TokenLifetime 480   
+
+              New-Item -Path 'C:\Users\Administrator\Documents\remove.ps1' -ItemType File  
+              Add-Content C:\Users\Administrator\Documents\remove.ps1 "Remove-S3Object -BucketName $bname -Key FederationMetadata.xml -Force"
+              Start-Process powershell.exe -NoNewWindow -ArgumentList "-noexit -command C:\Users\Administrator\Documents\remove.ps1"
+
+              Start-Process "chrome.exe" "https://localhost/adfs/ls/IdpInitiatedSignOn.aspx" 
+
+          }
+          else
+          {
+              
+              #install chrome
+              $LocalTempDir = $env:TEMP; $ChromeInstaller = "ChromeInstaller.exe"; (new-object  System.Net.WebClient).DownloadFile('http://dl.google.com/chrome/install/375.126/chrome_installer.exe', "$LocalTempDir\$ChromeInstaller"); & "$LocalTempDir\$ChromeInstaller" /silent /install; $Process2Monitor =  "ChromeInstaller"; Do { $ProcessesFound = Get-Process | ?{$Process2Monitor -contains $_.Name} | Select-Object -ExpandProperty Name; If ($ProcessesFound) { "Still running: $($ProcessesFound -join ', ')" | Write-Host; Start-Sleep -Seconds 2 } else { rm "$LocalTempDir\$ChromeInstaller" -ErrorAction SilentlyContinue -Verbose } } Until (!$ProcessesFound)
+              $chromePath = "$Env:ProgramFiles(x86)\Google\Chrome\Application\" 
+              $chromeApp = "chrome.exe"
+              
+              Start-Sleep -s 570
+              
+              #joining the domains
+              Get-NetAdapter -Name "Ethernet" | Set-DnsClientServerAddress -ServerAddresses ("$varIP1")
+
+              #adding a user
+              $domain = $var1
+              $password = ConvertTo-SecureString "${UserPass}" -AsPlainText -Force
+              $user = "${UserName}" 
+              $credential = New-Object System.Management.Automation.PSCredential($user,$password)
+              Add-Computer -DomainName $domain -Credential $credential -Restart -Force
+          }
+          </powershell>
+          <persist>true</persist>
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 281c4fdf-1e76-432b-925f-41bc9b79ce96
+    DependsOn:
+      - EC2I1MDC1
+      - MyBucket
+  IdentityProvider:
+    Type: 'Custom::IdentityProvider'
+    Properties:
+      ServiceToken: !GetAtt 
+        - ProviderCreator
+        - Arn
+      Region: !Ref 'AWS::Region'
+      saml_provider_name: !Ref SamlProviderName
+    DependsOn: ProviderCreator
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: e447b3d5-1aba-4eac-aecc-e683d8b0c013
+  ProviderCreator:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Runtime: python2.7
+      Handler: index.lambda_handler
+      MemorySize: 128
+      Role: !GetAtt 
+        - LambdaExecutionRole
+        - Arn
+      Timeout: 900
+      Code:
+        ZipFile: !Sub |
+          import boto3
+          from botocore.exceptions import ClientError
+          import json
+          import cfnresponse
+          iam = boto3.client("iam")
+          s3 = boto3.resource("s3")
+          def create_provider(name, doc):
+            try:
+              resp = iam.create_saml_provider(SAMLMetadataDocument=doc,Name=name)
+              print("inside create_provider")
+              return(True, resp['SAMLProviderArn'])
+            except Exception as e:
+              print(e)
+              return (False, "Cannot create SAML provider: " + str(e))
+          def delete_provider(arn):
+            try:
+              resp = iam.delete_saml_provider(SAMLProviderArn=arn)
+              return (True, "SAML provider with ARN " + arn + " deleted")
+            except ClientError as e:
+              if e.response['Error']['Code'] == "NoSuchEntity":
+                # no need to delete a thing that doesn't exist
+                return (True, "SAML provider with ARN " + arn + " does not exist, deletion succeeded")
+              else:
+                return (False, "Cannot delete SAML provider with ARN " + arn + ": " + str(e))
+            except Exception as e:
+              return (False, "Cannot delete SAML provider with ARN " + arn + ": " + str(e))
+          def update_provider(arn, doc):
+            # Need to create the ARN from the name
+            arn = "arn:aws:iam::${AWS::AccountId}:saml-provider/" + name
+            try:
+              resp = iam.update_saml_provider(SAMLMetadataDocument=doc, SAMLProviderArn=arn)
+              return (True, "SAML provider " + arn + " updated")
+            except Exception as e:
+              return (False, "Cannot update SAML provider " + arn + ": " + str(e))
+          def get_folder_size(bucket):
+            total_size = 0
+            for obj in boto3.resource('s3').Bucket(bucket).objects.all():
+              total_size += obj.size
+              return total_size
+          def lambda_handler(event, context):
+            s3Client = boto3.client('s3')
+            while get_folder_size("${S3BucketName}") is None:
+              print('Waiting')
+            data = s3Client.get_object(Bucket="${S3BucketName}", Key="FederationMetadata.xml")
+            provider_xml = data['Body'].read().decode('utf-8')
+            provider_name = '${SamlProviderName}'
+            # create a default ARN from the name; will be overwritten if we are creating
+            provider_arn = "arn:aws:iam::${AWS::AccountId}:saml-provider/" + provider_name
+            if event['RequestType'] == 'Create':
+              res, provider_arn = create_provider(provider_name, provider_xml)
+              reason = "Creation succeeded"
+            elif event['RequestType'] == 'Update':
+              res, reason = update_provider(provider_arn, provider_xml)
+            elif event['RequestType'] == 'Delete':
+              res, reason = delete_provider(provider_arn)
+            else:
+              res = False
+              resp = "Unknown operation: " + event['RequestType']
+            responseData = {}
+            responseData['Reason'] = reason
+            if res:
+              cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, provider_arn)
+            else:
+              cfnresponse.send(event, context, cfnresponse.FAILED, responseData, provider_arn)
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 32d617f6-afb9-40c9-bd6b-10c3dc8a8f72
+    DependsOn:
+      - EC2I1ADFS1
+  LambdaExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'iam:*SamlProvider'
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource: '*'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: deffc1ae-bff8-4b6a-b14e-3564493f7a72
+  UserRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub "AWS-${IAMRoleName}"
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action: 'sts:AssumeRoleWithSAML'
+            Effect: Allow
+            Condition:
+              StringEquals:
+                'SAML:aud': 'https://signin.aws.amazon.com/saml'
+            Principal:
+              Federated: !Sub 'arn:aws:iam::${AWS::AccountId}:saml-provider/${SamlProviderName}'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 17e05aca-13f8-4fe6-9aa0-a09be3c43af3
+    DependsOn:
+      - IdentityProvider
+  IAMRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: IAMS3Role
+      Path: /
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/AmazonS3FullAccess'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: 'sts:AssumeRole'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 037124e6-9108-4fe7-bb34-0d6df851da35
+  EC2InstanceProfile:
+    Type: 'AWS::IAM::InstanceProfile'
+    Properties:
+      Path: /
+      Roles:
+        - !Ref IAMRole
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 8baf6c02-7ae5-4d81-a793-7ac9852cab7f
+  BucketPolicy:
+    Type: 'AWS::IAM::Policy'
+    Properties:
+      PolicyName: BucketPolicy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: 's3:*'
+            Resource: !Sub 'arn:aws:s3:::${S3BucketName}*'
+      Roles:
+        - !Ref LambdaExecutionRole
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 35933ede-3465-4157-893d-ad66423a2c60
+Parameters:
+  UserName:
+    Description: Give a valid username
+    Type: String
+  GroupName:
+    Description: Give a group name
+    Type: String
+  DSRMpass:
+    Description: Give a recovery password
+    Type: String
+    NoEcho: true
+  UserPass:
+    Description: Give a user-password
+    Type: String
+    NoEcho: true
+  DomainName:
+    Description: Give a domain name
+    Type: String
+  SamlProviderName:
+    Type: String
+    Description: The name for your SAML provider in IAM
+  KeypairName:
+    Description: Give your key-pair name for launching EC2 instances
+    Type: String
+  IAMRoleName:
+    Description: Note that the role name you specify will be prefixed with AWS (Eg- AWS-DEV)
+    Type: String
+  S3BucketName:
+    Description: Give a unique bucket name
+    Type: String
+  VPCid:
+    Description: Give your VPC-Id
+    Type: String
