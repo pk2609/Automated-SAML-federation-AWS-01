@@ -1,0 +1,122 @@
+$varIP1 = "${EC2I1MDC1.PrivateIp}"
+          $var1 = "${DomainName}"
+          $sd = $var1.split(".")
+          $subdomain = $sd[0]
+          $var4 = $subdomain
+          $data2 = $subdomain.ToUpper()
+          $var2 = "CN=$env:COMPUTERNAME."
+          $var5 = "$env:COMPUTERNAME."
+          $var2 += $var1
+          $var5 += $var1
+          $var3 = '\adfssvc'
+          $var4 += $var3
+          $data1 = 'C:\Users\Administrator.'
+          $data1 += $data2
+          $admin = '\Administrator'
+          $bname = "${S3BucketName}"
+
+          if((Get-WmiObject -Class Win32_ComputerSystem).PartOfDomain)
+          {  
+              $Filename = 'C:\Users\Administrator\Documents\log.ps1'
+
+                  $username=$data2+$admin
+                  $password="elGOaat12x!"
+                  $securePassword = ConvertTo-SecureString $password -AsPlainText -Force
+                  $credential = New-Object System.Management.Automation.PSCredential $username, $securePassword
+              
+              if(-Not(Test-Path $Filename))
+              {    
+                  New-Item -Path 'C:\Users\Administrator\Documents\log.ps1' -ItemType File
+                  Copy-Item "C:\Program Files\Amazon\Ec2ConfigService\Scripts\UserScript.ps1" -Destination "C:\Users\Administrator\Documents\script.ps1"
+                  Start-Process powershell.exe -Credential $credential -NoNewWindow -ArgumentList "-noexit -command C:\Users\Administrator\Documents\script.ps1"
+              }
+              #install IIS
+              Install-WindowsFeature -Name Web-Server -IncludeAllSubFeature -IncludeManagementTools -Credential $credential
+
+              #install ADFS
+              Add-WindowsFeature ADFS-Federation -includeAllSubFeature -IncludeManagementTools -restart  -Credential $credential
+
+              #get a self-signed certificate
+              $source =  'C:\Users\Administrator\Documents\cert1.zip'
+              $dest = 'C:\Users\Administrator\Documents\cert1.ps1'
+              powershell -command "& { iwr https://gallery.technet.microsoft.com/scriptcenter/Self-signed-certificate-5920a7c6/file/101251/2/New-SelfSignedCertificate.zip -OutFile $source }"
+              [System.Reflection.Assembly]::LoadWithPartialName('System.IO.Compression.FileSystem')
+              [System.IO.Compression.ZipFile]::ExtractToDirectory($source, $dest)
+              
+              Import-Module  'C:\Users\Administrator\Documents\cert1.ps1\New-SelfSignedCertificateEx.ps1'
+              $selfSignedCert = New-SelfSignedCertificateEx -Subject $var2 -EKU "Server Authentication" -KeyUsage 0xa0 -StoreLocation "LocalMachine" -ProviderName "Microsoft Strong Cryptographic Provider" -Exportable
+              $certThumbprint = $selfSignedCert.Thumbprint
+             
+              #configuring ADFS
+              $svcpassword = ConvertTo-SecureString "${UserPass}" -AsPlainText -Force
+              $svcuser = $var4
+              $svccredential = New-Object System.Management.Automation.PSCredential($svcuser,$svcpassword)
+              Import-Module ADFS
+              Install-AdfsFarm -CertificateThumbprint:$certThumbprint -FederationServiceDisplayName:"QLADFS" -FederationServiceName:$var5 -Credential $credential -ServiceAccountCredential:$svccredential 
+              #setspn -a host/localhost adfssvc
+              [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true} ;
+              (new-object System.Net.WebClient).DownloadFile("https://localhost/FederationMetadata/2007-06/FederationMetadata.xml", 'C:\Users\Administrator\Desktop\FederationMetadata.xml')  
+              
+              Add-Content $Filename "Write-S3Object -BucketName $bname -File C:\Users\Administrator\Desktop\FederationMetadata.xml"
+              Start-Process powershell.exe -NoNewWindow -ArgumentList "-noexit -command C:\Users\Administrator\Documents\log.ps1"
+              Start-Sleep -s 60
+              #adding claim rules
+
+              $ProviderName = "${SamlProviderName}"
+              
+              $claimrules1 = '@RuleTemplate = "Transform an Incoming Claim" @RuleName = "NameId" c:[Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsaccountname"]=> issue(Type = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", Issuer = c.Issuer, OriginalIssuer = c.OriginalIssuer, Value = c.Value, ValueType = c.ValueType, Properties["http://schemas.xmlsoap.org/ws/2005/05/identity/claimproperties/format"] = "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent");'
+
+              $claimrules2='@RuleTemplate = "Send LDAP Attributes as Claims" @RuleName = "RoleSessionName" c:[Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsaccountname", Issuer == "AD AUTHORITY"]=> issue(store = "Active Directory", types = ("https://aws.amazon.com/SAML/Attributes/RoleSessionName"), query = ";mail;{0}", param = c.Value);'
+
+              $claimrules3='@RuleName = "GetADGroups" c:[Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/windowsaccountname", Issuer == "AD AUTHORITY"]=> add(store = "Active Directory", types = ("http://temp/variable"), query = ";tokenGroups;{0}", param = c.Value);'                                                                                        
+              
+              Add-Content C:\Users\Administrator\Documents\accnumber.ps1 '$Global:AccId = (Get-STSCallerIdentity).Account'
+              cd C:\Users\Administrator\Documents
+              .\accnumber.ps1
+              $cr1 = '@RuleName = "Roles" c:[Type == "http://temp/variable", Value =~ "(?i)^AWS-"]
+              => issue(Type = "https://aws.amazon.com/SAML/Attributes/Role", Value = RegExReplace(c.Value, "AWS-", "arn:aws:iam::'
+              $cr2 = ':saml-provider/'
+              $cr3 = ',arn:aws:iam::'
+              $cr4 = ':role/AWS-"));'
+              $claimrules4 = $cr1+$AccId+$cr2+$ProviderName+$cr3+$AccId+$cr4
+              
+              $claimrules5='@RuleName = "SessionDuration" => issue(Type = "https://aws.amazon.com/SAML/Attributes/SessionDuration", Value = "28800");'
+              
+              $claimrules=$claimrules1+$claimrules2+$claimrules3+$claimrules4+$claimrules5
+
+              $issuerule='=> issue(Type = "http://schemas.microsoft.com/authorization/claims/permit", Value = "true");'
+              
+              Add-Content 'C:\Users\Administrator\Documents\rules.txt' $claimrules   
+
+              Add-ADFSRelyingPartyTrust -Name "Amazon Web Services" -MetadataURL "https://signin.aws.amazon.com/static/saml-metadata.xml" -IssuanceAuthorizationRules $issuerule 
+              $RuleSet = New-AdfsClaimRuleSet -ClaimRuleFile 'C:\Users\Administrator\Documents\rules.txt' 
+              Set-AdfsRelyingPartyTrust -TargetName "Amazon Web Services" -IssuanceTransformRules $RuleSet.ClaimRulesString 
+              Set-ADFSRelyingPartyTrust -TargetName "Amazon Web Services" -TokenLifetime 480   
+
+              New-Item -Path 'C:\Users\Administrator\Documents\remove.ps1' -ItemType File  
+              Add-Content C:\Users\Administrator\Documents\remove.ps1 "Remove-S3Object -BucketName $bname -Key FederationMetadata.xml -Force"
+              Start-Process powershell.exe -NoNewWindow -ArgumentList "-noexit -command C:\Users\Administrator\Documents\remove.ps1"
+
+              Start-Process "chrome.exe" "https://localhost/adfs/ls/IdpInitiatedSignOn.aspx" 
+
+          }
+          else
+          {
+              
+              #install chrome
+              $LocalTempDir = $env:TEMP; $ChromeInstaller = "ChromeInstaller.exe"; (new-object  System.Net.WebClient).DownloadFile('http://dl.google.com/chrome/install/375.126/chrome_installer.exe', "$LocalTempDir\$ChromeInstaller"); & "$LocalTempDir\$ChromeInstaller" /silent /install; $Process2Monitor =  "ChromeInstaller"; Do { $ProcessesFound = Get-Process | ?{$Process2Monitor -contains $_.Name} | Select-Object -ExpandProperty Name; If ($ProcessesFound) { "Still running: $($ProcessesFound -join ', ')" | Write-Host; Start-Sleep -Seconds 2 } else { rm "$LocalTempDir\$ChromeInstaller" -ErrorAction SilentlyContinue -Verbose } } Until (!$ProcessesFound)
+              $chromePath = "$Env:ProgramFiles(x86)\Google\Chrome\Application\" 
+              $chromeApp = "chrome.exe"
+              
+              Start-Sleep -s 570
+              
+              #joining the domains
+              Get-NetAdapter -Name "Ethernet" | Set-DnsClientServerAddress -ServerAddresses ("$varIP1")
+
+              #adding a user
+              $domain = $var1
+              $password = ConvertTo-SecureString "${UserPass}" -AsPlainText -Force
+              $user = "${UserName}" 
+              $credential = New-Object System.Management.Automation.PSCredential($user,$password)
+              Add-Computer -DomainName $domain -Credential $credential -Restart -Force
+          }
