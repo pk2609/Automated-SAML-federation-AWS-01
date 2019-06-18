@@ -1,6 +1,18 @@
 # Automated-SAML-federation-AWS-01-
 Automation of SAML federation using AD and ADFS servers
 
+# Requirements:
+User name: A valid user-name of your choice.
+Group name: A adds forest group name
+DSRM pass: A recovery password for the DC server.
+UserPass: A password for the created user.
+Domain name: A unique domain name to create a new forest.
+SAMLProviderName: Name of the idp you wish to choose.
+KeyPairName: A new key pair for the ec2 instances. (You will need to create one on your own in your AWS account/console)
+IAMRoleName: The role name your users wish to assume while logging into the AWS console.
+S3BucketName: The name of the S3 bucket you wish to create. (To handle the federation metadata)
+VPCId: Your unique VPCId.
+
 # AWS Services Used
 1. CloudFormation: Used to create the template that provisions all the required resources and automates the process.
 
