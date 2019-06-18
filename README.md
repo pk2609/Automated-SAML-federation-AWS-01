@@ -1,7 +1,7 @@
 # Automated-SAML-federation-AWS-01-
 Automation of SAML federation using AD and ADFS servers
 
-# Requirements:
+# Requirements for cloud-formation template:
 User name: A valid user-name of your choice.
 
 Group name: A adds forest group name
