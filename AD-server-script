@@ -1,0 +1,64 @@
+	        $varIP = Invoke-RestMethod
+          http://169.254.169.254/latest/meta-data/local-ipv4
+
+          $dn = "${DomainName}"
+          
+          $sd = $dn.split(".")
+          
+          $subdomain = $sd[0]
+          
+          $netbios = $subdomain.ToUpper()
+
+          $userpasswd=ConvertTo-SecureString "${UserPass}" -asplaintext -Force
+
+          $passwd=ConvertTo-SecureString "${DSRMpass}" -asplaintext -Force
+
+          $usernm="${UserName}"
+
+          $urnm = $usernm
+
+          $svcacc = "adfssvc"
+
+          $atrate = '@'
+
+          $atrate+=$dn
+
+          $groupnm="${GroupName}"
+
+          $urnm+=$atrate
+
+          $svcacc+=$atrate
+
+          services.msc
+
+          if(-NOT(Get-Module -Name ActiveDirectory))
+
+          {
+              install-windowsfeature AD-Domain-Services -IncludeManagementTools
+          }
+
+          $osInfo = Get-CimInstance -ClassName Win32_OperatingSystem
+
+          if($osInfo.ProductType -ne 2)
+
+          { 
+            Import-Module ADDSDeployment
+            Install-ADDSForest -CreateDnsDelegation:$false -DatabasePath "C:\Windows\NTDS" -DomainMode "Win2012R2" -DomainName "${DomainName}" -DomainNetbiosName $netbios -ForestMode "Win2012R2" -InstallDns:$true -LogPath "C:\Windows\NTDS" -NoRebootOnCompletion:$false -SysvolPath "C:\Windows\SYSVOL" -Force:$true -SafeModeAdministratorPassword $passwd
+          }
+
+          Start-Sleep -s 10
+
+          if(-NOT(Get-ADUser -Filter {Name -eq $usernm}))
+          {
+              Import-Module ActiveDirectory
+              New-ADUser -Name $usernm -GivenName $usernm -SamAccountName $usernm -UserPrincipalName "$urnm" -AccountPassword $userpasswd -Enabled $true -EmailAddress "$urnm" -ChangePasswordAtLogon $False -PasswordNeverExpires $True              
+              New-ADUser -Name "adfssvc" -GivenName "adfssvc" -SamAccountName "adfssvc" -UserPrincipalName "$svcacc" -AccountPassword $userpasswd -Enabled $true -EmailAddress "$svcacc" -ChangePasswordAtLogon $False -PasswordNeverExpires $True
+          }
+          if(-NOT(Get-ADGroup -Filter {Identity -eq $groupnm}))
+          {
+              New-ADGroup -Name $groupnm -GroupScope Global
+              Add-ADGroupMember -Identity $groupnm -Member $usernm
+          }
+          
+          $user = [ADSI]"WinNT://./Administrator";
+          $user.SetPassword("elGOaat12x!");
