@@ -1,5 +1,5 @@
 # Automated-SAML-federation-AWS-01-
-Automation of SAML federation using AD and ADFS servers
+Automation of SAML federation using AD and ADFS servers. Set up the Active Directory (AD) and the Active Directory Federation Services (ADFS) on two separate servers. In this case, AWS EC2 is used to create these instances. Configure both the servers according to the needs of the SP. After setting up the server configurations, register the IDP in AWS IAM. The next process is to build trust between ADFS and AD by sharing certificates, endpoints and SAML metadata (in XML format). Claim rules are configured in ADFS management to ensure that the SAML structure is created appropriately. This complete process is automated by creating an AWS CloudFormation template so that SAML Federation can be achieved by the click of a single button. The required parameters are passed by the user.
 
 # Requirements for cloud-formation template:
 User name: A valid user-name of your choice.
