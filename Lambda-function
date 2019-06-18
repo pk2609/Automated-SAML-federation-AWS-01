@@ -1,0 +1,64 @@
+import boto3
+          from botocore.exceptions import ClientError
+          import json
+          import cfnresponse
+          iam = boto3.client("iam")
+          s3 = boto3.resource("s3")
+          def create_provider(name, doc):
+            try:
+              resp = iam.create_saml_provider(SAMLMetadataDocument=doc,Name=name)
+              print("inside create_provider")
+              return(True, resp['SAMLProviderArn'])
+            except Exception as e:
+              print(e)
+              return (False, "Cannot create SAML provider: " + str(e))
+          def delete_provider(arn):
+            try:
+              resp = iam.delete_saml_provider(SAMLProviderArn=arn)
+              return (True, "SAML provider with ARN " + arn + " deleted")
+            except ClientError as e:
+              if e.response['Error']['Code'] == "NoSuchEntity":
+                # no need to delete a thing that doesn't exist
+                return (True, "SAML provider with ARN " + arn + " does not exist, deletion succeeded")
+              else:
+                return (False, "Cannot delete SAML provider with ARN " + arn + ": " + str(e))
+            except Exception as e:
+              return (False, "Cannot delete SAML provider with ARN " + arn + ": " + str(e))
+          def update_provider(arn, doc):
+            # Need to create the ARN from the name
+            arn = "arn:aws:iam::${AWS::AccountId}:saml-provider/" + name
+            try:
+              resp = iam.update_saml_provider(SAMLMetadataDocument=doc, SAMLProviderArn=arn)
+              return (True, "SAML provider " + arn + " updated")
+            except Exception as e:
+              return (False, "Cannot update SAML provider " + arn + ": " + str(e))
+          def get_folder_size(bucket):
+            total_size = 0
+            for obj in boto3.resource('s3').Bucket(bucket).objects.all():
+              total_size += obj.size
+              return total_size
+          def lambda_handler(event, context):
+            s3Client = boto3.client('s3')
+            while get_folder_size("${S3BucketName}") is None:
+              print('Waiting')
+            data = s3Client.get_object(Bucket="${S3BucketName}", Key="FederationMetadata.xml")
+            provider_xml = data['Body'].read().decode('utf-8')
+            provider_name = '${SamlProviderName}'
+            # create a default ARN from the name; will be overwritten if we are creating
+            provider_arn = "arn:aws:iam::${AWS::AccountId}:saml-provider/" + provider_name
+            if event['RequestType'] == 'Create':
+              res, provider_arn = create_provider(provider_name, provider_xml)
+              reason = "Creation succeeded"
+            elif event['RequestType'] == 'Update':
+              res, reason = update_provider(provider_arn, provider_xml)
+            elif event['RequestType'] == 'Delete':
+              res, reason = delete_provider(provider_arn)
+            else:
+              res = False
+              resp = "Unknown operation: " + event['RequestType']
+            responseData = {}
+            responseData['Reason'] = reason
+            if res:
+              cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, provider_arn)
+            else:
+              cfnresponse.send(event, context, cfnresponse.FAILED, responseData, provider_arn)
