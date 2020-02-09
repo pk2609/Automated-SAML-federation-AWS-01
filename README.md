@@ -53,6 +53,6 @@ VPCId: Your unique VPCId.
 
 2. Implementing any feedbacks given and improving the project accordingly.
 
-3. Pushing the project for AppSec Review for global scope.
+3. Pushing the project for global scope.
 
-4. Finally, to try and push the project to customers.
+4. Finally, to try to make it customer facing.
